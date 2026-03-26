@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Attendance System - Web Demo</title>
+<style>
+body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding: 20px; color: white; }
+.container { max-width: 1200px; margin: auto; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; backdrop-filter: blur(10px); }
+h1 { text-align: center; font-size: 2.5em; margin-bottom: 10px; }
+.stats { text-align: center; background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; margin-bottom: 30px; }
+.tab-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+.tab-btn { background: rgba(255,255,255,0.2); border: none; padding: 15px 30px; border-radius: 50px; color: white; font-size: 16px; cursor: pointer; transition: all 0.3s; }
+.tab-btn.active, .tab-btn:hover { background: rgba(255,255,255,0.4); transform: translateY(-2px); }
+.tab-content { display: none; background: rgba(255,255,255,0.15); padding: 25px; border-radius: 15px; }
+.tab-content.active { display: block; }
+table { width: 100%; border-collapse: collapse; background: white; color: black; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; text-align: left; }
+td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+tr:hover { background: #f8f9ff; }
+.btn { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border: none; padding: 10px 20px; border-radius: 25px; color: white; cursor: pointer; font-weight: bold; transition: all 0.3s; margin: 5px; }
+.btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.input { padding: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; background: rgba(255,255,255,0.9); font-size: 14px; margin: 5px; }
+.theme-toggle { position: fixed; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; }
+.dark { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: #fff !important; }
+.dark table { background: #2a2a2a; color: #fff; }
+.dark th { background: linear-gradient(135deg, #434343 0%, #000 100%) !important; color: #fff !important; }
+.dark tr:hover { background: #3a3a3a; }
+</style>
+</head>
+<body>
+<div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+<div class="container">
+<h1>🚀 Smart Attendance System v2.0</h1>
+<div class="stats">
+<span>👥 <span id="studentCount">4</span> Students | 📊 Avg: <span id="avgAttendance">85%</span>% | 📅 Today: <span id="todayCount">2/4</span></span>
+</div>
+
+<div class="tab-buttons">
+<button class="tab-btn active" onclick="showTab('students')">👥 Students</button>
+<button class="tab-btn" onclick="showTab('attendance')">📋 Attendance</button>
+<button class="tab-btn" onclick="showTab('reports')">📈 Reports</button>
+</div>
+
+<div id="students" class="tab-content active">
+<h2>Students Management</h2>
+<div style="margin-bottom: 20px;">
+<input class="input" id="idInput" placeholder="ID">
+<input class="input" id="nameInput" placeholder="Name">
+<input class="input" id="classInput" placeholder="Class">
+<button class="btn" onclick="addStudent()">➕ Add</button>
+<button class="btn" onclick="refreshStudents()">🔄 Refresh</button>
+</div>
+<table>
+<thead>
+<tr><th>ID</th><th>Name</th><th>Class</th></tr>
+</thead>
+<tbody id="studentTable">
+<tr><td>101</td><td>John Doe</td><td>CS101</td></tr>
+<tr><td>102</td><td>Jane Smith</td><td>CS101</td></tr>
+<tr><td>103</td><td>Alice Johnson</td><td>Math202</td></tr>
+<tr><td>104</td><td>Razeen</td><td>CS101</td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="attendance" class="tab-content">
+<h2>Mark Attendance</h2>
+<input class="input" id="dateInput" type="date" value="2024-03-23">
+<select class="input" id="classFilter">
+<option>All</option>
+<option>CS101</option>
+<option>Math202</option>
+</select>
+<button class="btn" onclick="loadAttendance()">Load</button>
+<button class="btn" onclick="saveAttendance()">💾 Save</button>
+<table>
+<thead>
+<tr><th>ID</th><th>Name</th><th>Class</th><th>Status</th></tr>
+</thead>
+<tbody id="attendanceTable">
+<tr><td>101</td><td>John Doe</td><td>CS101</td><td><select><option>Present</option><option>Absent</option></select></td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="reports" class="tab-content">
+<h2>Attendance Reports</h2>
+<input class="input" id="searchReport" placeholder="Search..." onkeyup="filterReport()">
+<input class="input" id="dateFilter" placeholder="YYYY-MM-DD">
+<button class="btn" onclick="loadReport()">Refresh</button>
+<button class="btn" onclick="exportReport()">📥 Export CSV</button>
+<table>
+<thead>
+<tr><th>ID</th><th>Name</th><th>Total</th><th>Present</th><th>%</th></tr>
+</thead>
+<tbody id="reportTable">
+<tr><td>101</td><td>John Doe</td><td>5</td><td>4</td><td>80%</td></tr>
+<tr><td>102</td><td>Jane Smith</td><td>5</td><td>3</td><td>60%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<script>
+let students = [
+  {id: '101', name: 'John Doe', class: 'CS101'},
+  {id: '102', name: 'Jane Smith', class: 'CS101'},
+  {id: '103', name: 'Alice Johnson', class: 'Math202'},
+  {id: '104', name: 'Razeen', class: 'CS101'}
+];
+let attendance = [];
+
+function showTab(tabName) {
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(tabName).classList.add('active');
+  if (tabName === 'attendance') loadAttendance();
+  if (tabName === 'reports') loadReport();
+}
+
+function addStudent() {
+  const id = document.getElementById('idInput').value;
+  const name = document.getElementById('nameInput').value;
+  const cls = document.getElementById('classInput').value;
+  if (id && name) {
+    students.push({id, name, class: cls});
+    document.getElementById('studentTable').innerHTML += `<tr><td>${id}</td><td>${name}</td><td>${cls}</td></tr>`;
+    document.getElementById('studentCount').textContent = students.length;
+    document.getElementById('idInput').value = '';
+    document.getElementById('nameInput').value = '';
+    document.getElementById('classInput').value = '';
+  }
+}
+
+function refreshStudents() {
+  document.getElementById('studentTable').innerHTML = students.map(s => `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.class}</td></tr>`).join('');
+}
+
+function loadAttendance() {
+  const cls = document.getElementById('classFilter').value;
+  const tbody = document.getElementById('attendanceTable');
+  tbody.innerHTML = students.filter(s => cls === 'All' || s.class === cls)
+    .map(s => `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.class}</td><td><select><option>Present</option><option>Absent</option></select></td></tr>`)
+    .join('');
+}
+
+function saveAttendance() {
+  const selects = document.querySelectorAll('#attendanceTable select');
+  console.log('Saved', selects.length, 'records');
+  alert('Attendance saved to CSV!');
+}
+
+function loadReport() {
+  const dateFilter = document.getElementById('dateFilter').value;
+  const tbody = document.getElementById('reportTable');
+  tbody.innerHTML = students.map(s => `<tr><td>${s.id}</td><td>${s.name}</td><td>5</td><td>4</td><td>80%</td></tr>`).join('');
+  document.getElementById('avgAttendance').textContent = '85';
+}
+
+function filterReport() {
+  const term = document.getElementById('searchReport').value.toLowerCase();
+  const rows = document.querySelectorAll('#reportTable tr');
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
+}
+
+function exportReport() {
+  let csv = 'ID,Name,Total,Present,\\n';
+  csv += students.map(s => `${s.id},${s.name},5,4`).join('\\n');
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'report.csv';
+  a.click();
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  const btn = document.querySelector('.theme-toggle');
+  btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+}
+
+document.getElementById('studentCount').textContent = students.length;
+</script>
+</body>
+</html>
+
