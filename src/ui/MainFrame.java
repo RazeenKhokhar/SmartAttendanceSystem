@@ -2,6 +2,8 @@ package ui;
 
 import java.awt.*;
 import javax.swing.*;
+import util.DataCache;
+import util.FileHandler;
 
 public class MainFrame extends JFrame {
     public MainFrame() {
@@ -22,7 +24,11 @@ public class MainFrame extends JFrame {
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(header, BorderLayout.NORTH);
 
-        // Tabs
+        // Preload cache
+        DataCache.invalidate();
+        FileHandler.initializeFiles();
+
+        // Tabs with cached data
         JTabbedPane tabs = new JTabbedPane();
         tabs.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         tabs.setBackground(Color.WHITE);
@@ -52,6 +58,6 @@ public class MainFrame extends JFrame {
     private JLabel statusLabel;
 
     public void setStatus(String msg) {
-        statusLabel.setText(msg);
+        if (statusLabel != null) statusLabel.setText(msg);
     }
 }

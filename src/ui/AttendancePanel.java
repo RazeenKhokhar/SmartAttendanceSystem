@@ -48,6 +48,15 @@ public class AttendancePanel extends JPanel {
         saveBtn.addActionListener(this::saveAttendance);
         top.add(saveBtn);
 
+        JButton refreshBtn = new JButton("🔄 Refresh");
+        refreshBtn.setBackground(primary);
+        refreshBtn.setForeground(Color.WHITE);
+        refreshBtn.setFocusPainted(false);
+        refreshBtn.setBorderPainted(false);
+        refreshBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        refreshBtn.addActionListener(e -> loadStudents());
+        top.add(refreshBtn);
+
         add(top, BorderLayout.NORTH);
 
         // Styled table like StudentPanel

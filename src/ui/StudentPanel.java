@@ -122,13 +122,7 @@ public class StudentPanel extends JPanel {
                 List<Student> students = FileHandler.loadStudents();
                 Student toDelete = students.get(row);
                 students.removeIf(s -> s.getId().equals(toDelete.getId()));
-                try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter("students.csv"))) {
-                    pw.println("ID,Name,Class");
-                    students.forEach(s -> pw.println(s.toString()));
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Delete failed", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+                FileHandler.saveStudents(students);
                 loadTable();
                 JOptionPane.showMessageDialog(this, "Student deleted successfully! ✅", "Deleted", JOptionPane.INFORMATION_MESSAGE);
             }

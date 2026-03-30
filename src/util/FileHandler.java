@@ -51,6 +51,7 @@ public class FileHandler {
 
     /**
      * Reads all students from the CSV file (supports ID,Name,Class).
+     * Validates ID non-empty.
      */
     public static List<Student> loadStudents() {
         List<Student> students = new ArrayList<>();
@@ -58,9 +59,9 @@ public class FileHandler {
             String line = reader.readLine(); // skip header
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length >= 2) {
-                    String cls = parts.length > 2 ? parts[2] : "";
-                    students.add(new Student(parts[0], parts[1], cls));
+                if (parts.length >= 2 && !parts[0].trim().isEmpty()) {
+                    String cls = parts.length > 2 ? parts[2].trim() : "";
+                    students.add(new Student(parts[0].trim(), parts[1].trim(), cls));
                 }
             }
         } catch (IOException e) {
@@ -70,13 +71,24 @@ public class FileHandler {
     }
 
     /**
-     * Appends a single new student to the CSV file.
+     * Appends a single new student to the CSV file (deprecated, use saveStudents).
      */
+    @Deprecated
     public static void saveStudent(Student student) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(STUDENT_FILE, true))) {
-            writer.println(student.toString());
+        List<Student> students = loadStudents();
+        students.add(student);
+        saveStudents(students);
+    }
+
+    /**
+     * Saves full list of students (overwrite CSV).
+     */
+    public static void saveStudents(List<Student> students) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(STUDENT_FILE))) {
+            writer.println("ID,Name,Class");
+            students.forEach(s -> writer.println(s.toString()));
         } catch (IOException e) {
-            System.out.println("Error saving student: " + e.getMessage());
+            System.out.println("Error saving students: " + e.getMessage());
         }
     }
 
@@ -109,6 +121,18 @@ public class FileHandler {
             }
         } catch (IOException e) {
             System.out.println("Error saving attendance list: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Saves full list of attendance (overwrite CSV).
+     */
+    public static void saveAttendance(List<Attendance> records) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(ATTENDANCE_FILE))) {
+            writer.println("Date,StudentID,Status");
+            records.forEach(r -> writer.println(r.toCSV()));
+        } catch (IOException e) {
+            System.out.println("Error saving attendance: " + e.getMessage());
         }
     }
 }
